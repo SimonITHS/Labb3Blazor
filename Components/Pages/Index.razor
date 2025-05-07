@@ -1,0 +1,92 @@
+﻿@page "/"
+@using Labb3Blazor.Models
+@using Labb3Blazor.Services
+
+@inject SkillService SkillService
+@inject ProjectService ProjectService
+
+@code {
+    private List<Skill> skills = new();
+    private List<Project> projects = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Hämta data från ditt API
+        skills = await SkillService.GetSkill();
+        projects = await ProjectService.GetProject();
+    }
+}
+
+<!-- Enkel sidtitel -->
+<h1>Mitt CV</h1>
+<p>Hej! Jag heter <strong>Simon Kovac</strong>. Jag är .NET-utvecklare med inrikting Azure.</p>
+
+<!-- Länkar till LinkedIn och GitHub -->
+<p>
+    <a href="https://www.linkedin.com/in/simon-k-004784221/" target="_blank">LinkedIn</a> |
+    <a href="https://github.com/SimonITHS" target="_blank">GitHub</a>
+</p>
+
+<!-- Enkel lista eller tabell för Skills -->
+<h2>Skills</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Namn</th>
+            <th>Års Erfarenhet</th>
+            <th>Skill-nivå</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var skill in skills)
+        {
+            <tr>
+                <td>@skill.Name</td>
+                <td>@skill.YearsOfExperience</td>
+                <td>@skill.SkillLevel</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Enkel lista eller tabell för Projekt -->
+<h2>Projekt</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Namn</th>
+            <th>Beskrivning</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var project in projects)
+        {
+            <tr>
+                <td>@project.Name</td>
+                <td>@project.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Lättare inline-styling (valfritt) -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid #ccc;
+        border-collapse: collapse;
+        padding: 8px;
+    }
+
+    h1, h2 {
+        margin-bottom: 10px;
+    }
+
+    p, table {
+        margin-bottom: 20px;
+    }
+</style>

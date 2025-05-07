@@ -1,0 +1,161 @@
+﻿@page "/admin"
+@using Labb3Blazor.Models
+@using Labb3Blazor.Services
+
+@inject IJSRuntime JS
+@inject SkillService SkillService
+@inject ProjectService ProjectService
+
+<h1>Admin Panel</h1>
+
+@if (!IsAdmin)
+{
+    <p>❌ Du har inte behörighet att se denna sida.</p>
+}
+else
+{
+    <h2>Lägg till en ny färdighet</h2>
+
+    <EditForm Model="newSkill" OnValidSubmit="AddSkill" FormName="AddSkillForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div>
+            <label for="skillName">Skill Name:</label>
+            <InputText id="skillName" @bind-Value="newSkill.Name" class="form-control" />
+        </div>
+        <div>
+            <label for="yearsOfExperience">Years of Experience:</label>
+            <InputText id="yearsOfExperience" @bind-Value="newSkill.YearsOfExperience" class="form-control" />
+        </div>
+        <div>
+            <label for="skillLevel">Skill Level:</label>
+            <InputText id="skillLevel" @bind-Value="newSkill.SkillLevel" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Lägg till</button>
+    </EditForm>
+
+    <h2>Alla Skills</h2>
+    <ul>
+        @foreach (var skill in skills)
+        {
+            <li>
+                @skill.Name - @skill.YearsOfExperience - @skill.SkillLevel
+                <button @onclick="() => TestClick(skill.Id)">Testa Klick</button>
+                <button @onclick="() => DeleteSkill(skill.Id)">🗑 Ta bort</button>
+            </li>
+        }
+    </ul>
+
+    <h2>Blazor Event Test</h2>
+    <button @onclick="() => TestClick(0)">Testa Klick</button>
+    <p>@clickMessage</p>
+
+    <h2>Lägg till ett nytt projekt</h2>
+
+    <EditForm Model="newProject" OnValidSubmit="AddProject" FormName="AddProjectForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div>
+            <label for="projectName">Projekt Namn:</label>
+            <InputText id="projectName" @bind-Value="newProject.Name" class="form-control" />
+        </div>
+        <div>
+            <label for="projectDesc">Beskrivning:</label>
+            <InputText id="projectDesc" @bind-Value="newProject.Description" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Lägg till</button>
+    </EditForm>
+
+    <h2>Alla Projekt</h2>
+    <ul>
+        @foreach (var project in projects)
+        {
+            <li>
+                @project.Name - @project.Description
+                <button @onclick="() => DeleteProject(project.Id)">🗑 Ta bort</button>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Skill> skills = new();
+    private List<Project> projects = new();
+    private Skill newSkill = new() { Name = "", YearsOfExperience = "", SkillLevel = "" };
+    private Project newProject = new() { Name = "", Description = "" };
+    private bool IsAdmin = false;
+    private string clickMessage = "Ingen klick ännu";
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsAdmin = CheckIfUserIsAdmin();
+        if (IsAdmin)
+        {
+            await LoadData();
+        }
+    }
+
+    private bool CheckIfUserIsAdmin()
+    {
+        return "Simon Kovac" == "Simon Kovac"; // Byt ut detta mot riktig autentisering senare
+    }
+
+    private async Task LoadData()
+    {
+        skills = await SkillService.GetSkill();
+        projects = await ProjectService.GetProject();
+        StateHasChanged();
+    }
+
+    private async Task AddSkill()
+    {
+        Console.WriteLine("🔹 AddSkill() anropades!");
+
+        if (string.IsNullOrWhiteSpace(newSkill.Name))
+        {
+            Console.WriteLine("⚠️ Namn får inte vara tomt!");
+            return;
+        }
+
+        await SkillService.AddSkill(newSkill);
+        await LoadData();
+        newSkill = new Skill();
+    }
+
+    private async Task DeleteSkill(int skillId)
+    {
+        Console.WriteLine($"🔹 DeleteSkill() anropades för ID {skillId}");
+
+        await SkillService.DeleteSkill(skillId);
+        await LoadData();
+    }
+
+    private async Task AddProject()
+    {
+        Console.WriteLine("🔹 AddProject() anropades!");
+
+        if (string.IsNullOrWhiteSpace(newProject.Name))
+        {
+            Console.WriteLine("⚠️ Projekt Namn får inte vara tomt!");
+            return;
+        }
+
+        await ProjectService.AddProject(newProject);
+        await LoadData();
+        newProject = new Project();
+    }
+
+    private async Task DeleteProject(int projectId)
+    {
+        Console.WriteLine($"🔹 DeleteProject() anropades för ID {projectId}");
+        await ProjectService.DeleteProject(projectId);
+        await LoadData();
+    }
+
+    private void TestClick(int skillId)
+    {
+        clickMessage = $"✅ Knappen fungerade för skill ID {skillId}!";
+        Console.WriteLine($"🔹 TestClick() kördes för ID {skillId}");
+        StateHasChanged();
+    }
+}

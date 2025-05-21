@@ -11,13 +11,13 @@ namespace Labb3Blazor.Services
         }
         public async Task<List<Project>> GetProject()
         {
-            var projects = await _httpClient.GetFromJsonAsync<List<Project>>("https://labb3apidatabase-dqhfa9agc3hee2ec.westeurope-01.azurewebsites.net/projects");
+            var projects = await _httpClient.GetFromJsonAsync<List<Project>>("https://localhost:7234/projects");
             return projects ?? new List<Project>();
         }
 
         public async Task AddProject(Project project)
         {
-            var response = await _httpClient.PostAsJsonAsync("https://labb3apidatabase-dqhfa9agc3hee2ec.westeurope-01.azurewebsites.net/projects", project);
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:7234/project", project);
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine("❌ Misslyckades med att lägga till ett projekt");
@@ -26,7 +26,7 @@ namespace Labb3Blazor.Services
 
         public async Task DeleteProject(int projectId)
         {
-            var response = await _httpClient.DeleteAsync($"https://labb3apidatabase-dqhfa9agc3hee2ec.westeurope-01.azurewebsites.net/projects/{projectId}");
+            var response = await _httpClient.DeleteAsync($"https://localhost:7234/project/{projectId}");
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine("❌ Misslyckades med att ta bort ett projekt");

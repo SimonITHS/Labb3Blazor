@@ -1,4 +1,4 @@
-using Labb3Blazor.Components;
+using labb3blazor.Components;
 using Labb3Blazor.Services;
 
 namespace Labb3Blazor;
@@ -15,7 +15,7 @@ public class Program
 
         builder.Services.AddHttpClient("API", client =>
         {
-            client.BaseAddress = new Uri("https://simonportfolio-h4bge4hzckh4f3cx.westeurope-01.azurewebsites.net");
+            client.BaseAddress = new Uri("https://localhost:7234");
         });
         
         builder.Services.AddScoped<SkillService>();
